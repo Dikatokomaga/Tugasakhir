@@ -139,18 +139,18 @@ class Siswa extends CI_Controller
         $this->load->view('templates/menu');
         $this->load->view('siswa/detail', $data);
     }
-    public function file($id)
-    {
-        $query = $this->db->get_where('siswa', ['Id' => $id])->row();
-        if ($query) {
-            $file_path = './assets/sertifikat/'.$query->Sertifikat;
-            // printf($file_path);
-            // die;
-            force_download($file_path,null);
-        } else {
-            redirect('siswa');
-        }
-    }
+    // public function file($id)
+    // {
+    //     $query = $this->db->get_where('siswa', ['Id' => $id])->row();
+    //     if ($query) {
+    //         $file_path = './assets/sertifikat/'.$query->Sertifikat;
+    //         // printf($file_path);
+    //         // die;
+    //         force_download($file_path,null);
+    //     } else {
+    //         redirect('siswa');
+    //     }
+    // }
 
     public function pdf($Id)
     {
@@ -163,6 +163,16 @@ class Siswa extends CI_Controller
         // echo "</pre>";
         $html = $this->load->view('siswa/pdfmahasiswa', $data, true);
         $this->pdf->createPDF($html, 'mypdf', false);
+    }
+
+    public function file($id)
+    {
+        $data['siswa'] = $this->Siswa_model->getMahasiswaById($id);
+        $this->load->library('pdf');
+        $html = $this->load->view('siswa/template', $data['siswa'], true);
+        // print_r($data['siswa']); die;
+        $this->pdf->createPDF($html, 'mypdf', false);
+    
     }
  
 }

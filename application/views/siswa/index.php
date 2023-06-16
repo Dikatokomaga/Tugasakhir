@@ -65,6 +65,9 @@
 
                                                 <a href="<?= base_url('siswa/pdf/' . $row->Id) ?>" class="btn btn-primary btn-sm"><i class='bx bx-cloud-download'></i></a>
 
+                                                <a href="<?= base_url('siswa/file/' . $row->Id) ?>" class="btn btn-success btn-sm"><i class='bx bx-cloud-download'></i></a>
+
+
                                                 <a href="<?= site_url('siswa/detail/' . $row->Id) ?>" class="btn btn-warning btn-sm"><i class="fa fa-eye"></i> </a>
 
                                                 <a href="javascript:void(0);" data="<?= $row->Id ?>" class="btn btn-danger btn-sm item-delete"><i class="fa fa-trash"></i> </a>

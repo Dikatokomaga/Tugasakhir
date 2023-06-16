@@ -476,4 +476,11 @@ class Siswa_model extends CI_Model
         $data=$this->db->get_where('riwayat_pendidikan', ['id_siswa' => $id])->result();
          return $data;
     }
+    public function getmhwById($id)
+    {
+        $this->db->SELECT('s.*,sk.nama_sekolah');
+        $this->db->join('sekolah as sk','sk.id=s.Sekolah','left');
+        $data=$this->db->get_where('siswa as s', ['s.id' => $id])->row_array();
+         return $data;
+    }
 }
