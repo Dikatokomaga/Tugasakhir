@@ -75,7 +75,24 @@ class Siswa extends CI_Controller
         }
         $data['gambar'] = $this->db->get_where('siswa', ['id' => $id])->row_array();
         $data["title"] = "HEXA | Edit siswa";
-        $data["data_siswa"] = $Siswa->getById($id);
+        $this->db->select('s.*');
+        // $this->db->from('siswa s');
+        // $this->db->join("(select id_siswa, nama_sekolah from riwayat_pendidikan where id_siswa=".$id." and jenjang='sd') as sd", 'sd.id_siswa= s.id','left');
+
+        // $this->db->join(" (select id_siswa, nama_sekolah from riwayat_pendidikan where id_siswa=".$id." and jenjang='smp') as smp", ' smp.id_siswa= s.Id ','left');
+
+        // $this->db->join("(select id_siswa, nama_sekolah from riwayat_pendidikan where id_siswa=".$id." and jenjang='sma') as sma", 'sma.id_siswa= s.id','left');
+
+        // $this->db->where('s.id',$id);
+
+        $data["data_siswa"] = $this->db->get_where('siswa s', ['s.id' => $id])->row();
+        $data["data_riwayat_pendidikan"]= $this->db->get_where('riwayat_pendidikan', ['id_siswa' => $id])->result();
+        $data["data_portofolio"]= $this->db->get_where('portofolio', ['id_siswa' => $id])->result();
+        
+        // $data["data_siswa"] = $Siswa->getById($id);
+        // echo "<pre>";
+        // print_r($data["data_riwayat_pendidikan"][0]);die;
+        // echo "</pre>";
         if (!$data["data_siswa"]) show_404();
         $this->load->view('templates/header', $data);
         $this->load->view('templates/menu');
@@ -134,4 +151,18 @@ class Siswa extends CI_Controller
             redirect('siswa');
         }
     }
+
+    public function pdf($Id)
+    {
+        $data['magang'] = $this->Siswa_model->getMahasiswaById($Id);
+        $data['portofolio'] = $this->Siswa_model-> getPortofolio($Id);
+        $data['riwayat_pendidikan'] = $this->Siswa_model->getriwayatpendidikan($Id);
+        $this->load->library('pdf');
+        // echo "<pre>";
+        // print_r($data);die;
+        // echo "</pre>";
+        $html = $this->load->view('siswa/pdfmahasiswa', $data, true);
+        $this->pdf->createPDF($html, 'mypdf', false);
+    }
+ 
 }
