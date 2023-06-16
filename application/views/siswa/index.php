@@ -9,6 +9,10 @@
             <li class="breadcrumb-item"><a>Siswa</a></li>
             <li class="breadcrumb-item active" aria-current="page">List Data</li>
         </ol>
+
+    
+
+        
     </nav>
     <div class="row">
         <div class="col-lg-12">
@@ -19,6 +23,7 @@
                     echo $this->session->flashdata('message');
                 endif; ?>
             </div>
+
 
             <div class="card">
                 <div class="card-body">
@@ -46,20 +51,29 @@
                                         <td><?= $row->nama_sekolah ?></td>
                                         <td><?= $row->Alamat ?></td>
                                         <td><?php if ($row->Status == 'Aktif') : echo "<div class='text-center rounded p-1 bg-warning text-white'>Aktif</div>" ?>
+
                                             <?php elseif ($row->Status == 'Selesai') : echo "<div class='text-center rounded p-1 bg-success text-white'>Selesai</div>" ?>
+
                                             <?php elseif ($row->Status == 'Menunggu') : echo "<div class='text-center rounded p-1 bg-danger text-white'>Menunggu</div>"  ?>
-                                            <?php elseif ($row->Status == 'Pengajuan') : echo "<div class='text-center rounded p-1 bg-primary text-white'>Pengajuan</div>"  ?>
+
+                                            <?php elseif ($row->Status == 'Pengajuan') : echo "<div class='-center rounded p-1 bg-primary text-white'>Pengajuan</div>"  ?>
 
                                             <?php endif; ?></td>
                                         <td>
                                             <?php if ($row->Status == 'Selesai') : ?>
                                                 <a href="<?= site_url('siswa/edit/' . $row->Id) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i> </a>
-                                                <a href="<?= base_url('siswa/file/' . $row->Id) ?>" class="btn btn-primary btn-sm"><i class='bx bx-cloud-download'></i></a>
+
+                                                <a href="<?= base_url('siswa/pdf/' . $row->Id) ?>" class="btn btn-primary btn-sm"><i class='bx bx-cloud-download'></i></a>
+
                                                 <a href="<?= site_url('siswa/detail/' . $row->Id) ?>" class="btn btn-warning btn-sm"><i class="fa fa-eye"></i> </a>
+
                                                 <a href="javascript:void(0);" data="<?= $row->Id ?>" class="btn btn-danger btn-sm item-delete"><i class="fa fa-trash"></i> </a>
+
                                             <?php else : ?>
                                                 <a href="<?= site_url('siswa/edit/' . $row->Id) ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i> </a>
+
                                                 <a href="<?= site_url('siswa/detail/' . $row->Id) ?>" class="btn btn-warning btn-sm"><i class="fa fa-eye"></i> </a>
+
                                                 <a href="javascript:void(0);" data="<?= $row->Id ?>" class="btn btn-danger btn-sm item-delete"><i class="fa fa-trash"></i> </a>
                                             <?php endif; ?>
                                         </td>

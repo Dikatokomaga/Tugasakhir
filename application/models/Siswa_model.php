@@ -5,6 +5,12 @@ class Siswa_model extends CI_Model
 {
     private $table = 'siswa';
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->helper(array('form', 'url'));
+    }
+
     //validasi form, method ini akan mengembailkan data berupa rules validasi form       
     public function rules()
     {
@@ -100,7 +106,8 @@ class Siswa_model extends CI_Model
         $this->load->library('upload',  $config);
 
         if (!$this->upload->do_upload('Gambar')) {
-            redirect('siswa/add');
+            // redirect('siswa/add');
+            
         } else {
             $uploud_image = $this->upload->data('file_name');
         }
@@ -113,7 +120,7 @@ class Siswa_model extends CI_Model
         $this->upload->initialize($config2);
 
         if (!$this->upload->do_upload('DokumenCV')) {
-            redirect('siswa/add');
+            // redirect('siswa/add');
         } else {
             $uploud_CV = $this->upload->data('file_name');
         }
@@ -126,10 +133,13 @@ class Siswa_model extends CI_Model
         $this->upload->initialize($config3);
 
         if (!$this->upload->do_upload('Sertifikat')) {
-            redirect('siswa/add');
+            // redirect('siswa/add');
         } else {
             $uploud_sertifikat = $this->upload->data('file_name');
         }
+        // echo "<pre>";
+        // print_r($this->input->post());die;
+        // echo "</pre>";
 
         $data = array(
             "Nama" => $this->input->post('Nama'),
@@ -144,15 +154,121 @@ class Siswa_model extends CI_Model
             "Email" => $this->input->post('Email'),
             "Status" => $this->input->post('Status'),
             "Mulai" => $this->input->post('Mulai'),
-            "Berakhir" => $this->input->post('Berakhir')
+            "Berakhir" => $this->input->post('Berakhir'),
+            "nis" => $this->input->post('NIS'),
+            "nilai" => $this->input->post('NILAI')
         );
 
-        return $this->db->insert($this->table, $data);
+        if(!$uploud_image){
+            unset($data['Gambar']);
+        }
+
+        if(!$uploud_sertifikat){
+            unset($data['Sertifikat']);
+        }
+
+        if(!$uploud_CV){
+            unset($data['DokumenCV']);
+        }
+
+         $this->db->insert($this->table, $data);
+         $insert_id = $this->db->insert_id();
+         $data1 = [
+                ["id_siswa" => $insert_id,
+                "nama_sekolah" => $this->input->post('SD'),
+                "jenjang" => 'SD'],
+
+                ["id_siswa" => $insert_id,
+                    "nama_sekolah" => $this->input->post('SMP'),
+                    "jenjang" => 'SMP'],
+
+                ["id_siswa" => $insert_id,
+                    "nama_sekolah" => $this->input->post('SMA'),
+                    "jenjang" => 'SMA']];
+                $this->db->insert_batch('riwayat_pendidikan', $data1);
+
+        $tools= $this->input->post('tools');
+        $projects= $this->input->post('project');
+
+        $data_project = [];
+        $hasil_img = array();
+        $files = $_FILES;
+        $count_hasil = sizeof($_FILES['hasil']['name']);
+        $count_tools = sizeof($this->input->post('tools'));
+        $count_projects = sizeof($this->input->post('project'));
+        
+        if ($count_hasil > 0) {
+            for($i=0; $i<$count_hasil; $i++)
+                {
+                    $_FILES['hasil']['name']= $files['hasil']['name'][$i];
+                    $_FILES['hasil']['type']= $files['hasil']['type'][$i];
+                    $_FILES['hasil']['tmp_name']= $files['hasil']['tmp_name'][$i];
+                    $_FILES['hasil']['error']= $files['hasil']['error'][$i];
+                    $_FILES['hasil']['size']= $files['hasil']['size'][$i];    
+
+                    // $config_img_hasil['upload_path'] = './assets/img1/';
+                    // $config_img_hasil['allowed_types'] = 'pdf|doc|docx|png|jpg';
+                    // $config_img_hasil['max_size'] = 99999;
+                    // $config_img_hasil['max_width'] = 99999;
+                    // $config_img_hasil['max_height'] = 999999;
+                    // $this->upload->initialize($config_img_hasil);
+
+                    $this->upload->do_upload('hasil');
+                    $hasil_img[] = $this->upload->data();
+                }
+        }
+
+            // echo"<pre>";
+            //         // print_r($value);
+            //         print_r($hasil_img);die;
+            //         echo"</pre>";
+
+        if ($count_projects > 0 || $count_hasil > 0) {
+            foreach ($projects as $key => $value) {
+                // foreach ($hasil_img as $key2 => $val) {
+                    
+
+                    $datas =  ["id_siswa"=> $insert_id,"jenis_tugas" => $value,"tools"=>$tools[$key],"hasil"=>$hasil_img[$key]['file_name']];
+                    $this->db->insert('portofolio',$datas);
+                // }
+            }
+        }
+        
+
+        $sekolah= $this->input->post('nama_sekolah');
+        $jenjang= $this->input->post('jenjang');
+
+        $count_sekolah = sizeof($this->input->post('nama_sekolah'));
+        $count_jenjang = sizeof($this->input->post('jenjang'));
+
+        if ($count_sekolah > 0 || $count_jenjang > 0) {
+            foreach ($sekolah as $key => $value) {
+                // foreach ($hasil_img as $key2 => $val) {
+                    
+
+                    $datas1 =  ["id_siswa"=> $insert_id,"nama_sekolah" => $value,"jenjang"=>$jenjang[$key]];
+                    $this->db->insert('riwayat_pendidikan',$datas1);
+                // }
+            }
+        }
+        
+        // print_r($hasil_img);die;
+
+        // foreach ( $projects as $key => $value) {
+        //     $project= ["id_siswa"=> $insert_id,"jenis_tugas" => $value,"tools"=>$tools[$key],"hasil"=>$hasil[$key]];
+        //     $this->db->insert('portofolio',$project);
+        // }
+        
+
+
     }
 
     //edit data siswa
     public function update()
     {
+        // echo"<pre>";
+        // print_r($this->input->post());die;
+        // echo "</pre>";
         $config['upload_path']           =  './assets/img/';
         $config['allowed_types']         =  'gif|jpg|png';
         $config['max_size']              =  99999;
@@ -161,7 +277,7 @@ class Siswa_model extends CI_Model
         $this->load->library('upload',  $config);
 
         if (!$this->upload->do_upload('Gambar')) {
-            redirect('siswa/edit');
+            // redirect('siswa/edit');
         } else {
             $uploud_image = $this->upload->data('file_name');
         }
@@ -174,7 +290,7 @@ class Siswa_model extends CI_Model
         $this->upload->initialize($config2);
 
         if (!$this->upload->do_upload('DokumenCV')) {
-            redirect('siswa/edit');
+            // redirect('siswa/edit');
         } else {
             $uploud_CV = $this->upload->data('file_name');
         }
@@ -187,7 +303,7 @@ class Siswa_model extends CI_Model
         $this->upload->initialize($config3);
 
         if (!$this->upload->do_upload('Sertifikat')) {
-            redirect('siswa/edit');
+            // redirect('siswa/edit');
         } else {
             $uploud_sertifikat = $this->upload->data('file_name');
         }
@@ -205,10 +321,83 @@ class Siswa_model extends CI_Model
             "Status" => $this->input->post('Status'),
             "Link" => $this->input->post('Link'),
             "Mulai" => $this->input->post('Mulai'),
-            "Berakhir" => $this->input->post('Berakhir')
+            "Berakhir" => $this->input->post('Berakhir'),
+            "nis" => $this->input->post('NIS'),
+            "nilai" => $this->input->post('NILAI')
 
         );
+
+
+        $sekolah= $this->input->post('nama_sekolah');
+        $jenjang= $this->input->post('jenjang');
+
+        $count_sekolah = sizeof($this->input->post('nama_sekolah'));
+        $count_jenjang = sizeof($this->input->post('jenjang'));
+
+        $this->db->where('id_siswa',$this->input->post('Id'));
+        $this->db->delete('riwayat_pendidikan');
+
+        if ($count_sekolah > 0 || $count_jenjang > 0) {
+            foreach ($sekolah as $key => $value) {
+                // foreach ($hasil_img as $key2 => $val) {
+                    
+
+                    $datas1 =  ["id_siswa"=> $this->input->post('Id'),"nama_sekolah" => $value,"jenjang"=>$jenjang[$key]];
+                    $this->db->insert('riwayat_pendidikan',$datas1);
+                // }
+            }
+        }
+
+        $tools= $this->input->post('tools');
+        $projects= $this->input->post('project');
+
+        $data_project = [];
+        $hasil_img = array();
+        $files = $_FILES;
+        $count_hasil = sizeof($_FILES['hasil']['name']);
+        $count_tools = sizeof($this->input->post('tools'));
+        $count_projects = sizeof($this->input->post('project'));
+        
+        if ($count_hasil > 0) {
+            for($i=0; $i<$count_hasil; $i++)
+                {
+                    $_FILES['hasil']['name']= $files['hasil']['name'][$i];
+                    $_FILES['hasil']['type']= $files['hasil']['type'][$i];
+                    $_FILES['hasil']['tmp_name']= $files['hasil']['tmp_name'][$i];
+                    $_FILES['hasil']['error']= $files['hasil']['error'][$i];
+                    $_FILES['hasil']['size']= $files['hasil']['size'][$i];    
+
+                    // $config_img_hasil['upload_path'] = './assets/img1/';
+                    // $config_img_hasil['allowed_types'] = 'pdf|doc|docx|png|jpg';
+                    // $config_img_hasil['max_size'] = 99999;
+                    // $config_img_hasil['max_width'] = 99999;
+                    // $config_img_hasil['max_height'] = 999999;
+                    // $this->upload->initialize($config_img_hasil);
+
+                    $this->upload->do_upload('hasil');
+                    $hasil_img[] = $this->upload->data();
+                }
+        }
+        $this->db->where('id_siswa',$this->input->post('Id'));
+        $this->db->delete('portofolio');
+
+        if ($count_projects > 0 || $count_hasil > 0) {
+            foreach ($projects as $key => $value) {
+                // foreach ($hasil_img as $key2 => $val) {
+                    
+
+                    $datas =  ["id_siswa"=> $this->input->post('Id'),"jenis_tugas" => $value,"tools"=>$tools[$key],"hasil"=>$hasil_img[$key]['file_name']];
+                    $this->db->insert('portofolio',$datas);
+                // }
+            }
+        }
+    
+
+
+
+    
         return $this->db->update($this->table, $data, array('Id' => $this->input->post('Id')));
+
     }
 
     //hapus data siswa
@@ -262,5 +451,29 @@ class Siswa_model extends CI_Model
         $this->db->select('*');
         $query = $this->db->get('sekolah');
         return $query->result();
+    }
+
+    public function getMahasiswaById($id)
+    {
+        $this->db->SELECT('s.*,sk.nama_sekolah');
+        $this->db->join('sekolah as sk','sk.id=s.Sekolah','left');
+        $data=$this->db->get_where('siswa as s', ['s.id' => $id])->row();
+        // print_r($id);die;
+         return $data;
+    }
+    public function getPortofolio($id)
+    {
+        $this->db->SELECT('*');
+        // $this->db->join('sekolah as sk','sk.id=s.Sekolah','left');
+        $data=$this->db->get_where('portofolio', ['id_siswa' => $id])->result();
+         return $data;
+    }
+
+    public function getriwayatpendidikan($id)
+    {
+        $this->db->SELECT('*');
+        // $this->db->join('sekolah as sk','sk.id=s.Sekolah','left');
+        $data=$this->db->get_where('riwayat_pendidikan', ['id_siswa' => $id])->result();
+         return $data;
     }
 }

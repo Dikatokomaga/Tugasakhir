@@ -10,6 +10,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
+            <?= $data_siswa ?>
                 <div class="card-body">
                     <?php
                     //create form
@@ -27,6 +28,17 @@
                             </small>
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label for="Nama" class="col-sm-2 col-form-label">NIS</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="NIS" name="NIS" value="<?= $data_siswa->nis; ?>">
+                            <small class="text-danger">
+                                <?php echo form_error('nis') ?>
+                            </small>
+                        </div>
+                    </div>
+
                     <div class="form-group row">
                         <div class="col-sm-2">Gambar</div>
                         <div class="col-sm-10">
@@ -79,6 +91,7 @@
                                     <?php else : ?>
                                         <img src="<?= base_url('assets/sertifikat/default.jpg') ?>" alt="..." class="img-thumbnail">
                                     <?php endif; ?>
+
                                 </div>
                                 <div class="col-sm-5">
                                     <div class="custom-file">
@@ -89,6 +102,8 @@
                             </div>
                         </div>
                     </div>
+
+                   
 
                     <div class="form-group row">
                         <label for="Sekolah" class="col-sm-2 col-form-label">Sekolah</label>
@@ -244,6 +259,77 @@
                                 <?php echo form_error('selesai') ?>
                             </div>
                         </div>
+
+                        <!-- <div class="form-group row">
+                            <label for="Nama" class="col-sm-2 col-form-label"> SD</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="Nama" name="SD" value=" <?= $data_siswa->sd; ?>">
+                                <?php echo form_error('Nama', '<div class="text-danger">', '</div>') ?>
+                            </div>
+                           </div>
+
+                            <div class="form-group row">
+                            <label for="Nama" class="col-sm-2 col-form-label"> SMP</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="Nama" name="SMP" value=" <?= $data_siswa->smp; ?>">
+                                <?php echo form_error('Nama', '<div class="text-danger">', '</div>') ?>
+                            </div>
+                        </div>
+
+                            <div class="form-group row">
+                            <label for="Nama" class="col-sm-2 col-form-label">SMA</label>
+                            <div class="col-sm-10">
+                                <input type="text" required class="form-control" id="Nama" name="SMA" value=" <?= $data_siswa->sma; ?>">
+                                <?php echo form_error('Nama', '<div class="text-danger">', '</div>') ?>
+                            </div>
+                        </div> -->
+
+                        <div class="form-group row">
+                            <label for="Nama" class="col-sm-2 col-form-label">Nilai Keseluruhan</label>
+                            <div class="col-sm-10">
+                                <input type="TEXT" class="form-control" id="Nama" name="NILAI" value=" <?= $data_siswa->nilai; ?>">
+                                <?php echo form_error('Nama', '<div class="text-danger">', '</div>') ?>
+                            </div>
+                           </div>
+
+                        <h5 class="mt-4 mb-2">Riwayat Pendidikan</h5>
+                        <div class="row" style="width:100%">
+                       
+                        <table class="table" id="myTable2" >
+                            <thead>  
+                                <tr>
+                                <th>Jejang </th>
+                                <th>Asal Sekolah</th>
+                                <!-- <th>Hasil </th> -->
+                                </tr>
+                            </thead>
+                            </table>
+                            <br>
+                            <button type="button" onclick="addRow2()"  >Add Row</button>
+                        </div> 
+
+                        <h5 class="mt-4 mb-2">Portofolio</h5>
+                        <div class="row" style="width:100%">
+                           <table class="table" id="myTable">
+                            <thead>  
+                                <tr>
+                                <th>Project</th>
+                                <th>Tools</th>
+                                <th>Hasil </th>
+                                </tr>
+                            </thead>
+                            </table>
+                            <br>
+                            <button type="button" onclick="addRow()">Add Row</button>
+
+                            </div>
+                            <!-- <?php foreach ($data_riwayat_pendidikan as $key => $value) {
+                                echo "$value<br/>";
+                            }?> -->
+
+<h2><?php echo $data_riwayat_pendidikan[0]; ?></h2>
+                        
+
                         <div class="form-group row">
                             <div class="col-sm-10 offset-md-2">
                                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -258,6 +344,80 @@
     </div>
 </div>
 <script>
+ $('#FrmEditSiswa').on('change', function(e) {
+    e.preventDefault();
+
+ })
+// var $form = $('#FrmEditSiswa');
+// $form.on('submit', function(e) {
+//     e.preventDefault();
+    
+// })
+
+ function addRow() {
+      var table = document.getElementById("myTable");
+      var row = table.insertRow(table.rows.length);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      cell1.innerHTML = '<input class="form-control" type="text" name="project[]">';
+      cell2.innerHTML = '<input class="form-control" type="text" name="tools[]">';
+    //   cell3.innerHTML = '<input class="form-control" type="file" name="hasil[]">';
+      cell3.innerHTML = `<label class="btn btn-default btn-file">
+      Browse <input type="file" style="display: none;" name="hasil[]">
+      </label>`;
+      
+    }
+
+    var data_portofolio = <?php echo json_encode($data_portofolio); ?>;
+    // console.log(data_riwayat_pendidikan);
+    data_portofolio.map(function(item){
+        var table = document.getElementById("myTable");
+        var row = table.insertRow(table.rows.length);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+        cell1.innerHTML = '<input class="form-control" value="'+item.jenis_tugas+'" type="text" name="project[]" />';
+
+        cell2.innerHTML = '<input class="form-control" value="'+item.tools+'" type="text" name="tools[]" />';
+
+        // cell3.innerHTML = '<input class="form-control" value="'+item.hasil+'" type="file" name="hasil[]" />';
+        // console.log(item);
+        cell3.innerHTML = `<label class="btn btn-default btn-file">
+        `+item.hasil+` <input type="file" style="display: none;" name="hasil[]">
+        </label>`;
+    })
+
+    function addRow2() {
+      var table = document.getElementById("myTable2");
+      var row = table.insertRow(table.rows.length);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+    //   var cell3 = row.insertCell(2);
+      cell1.innerHTML = '<input class="form-control" type="text" name="nama_sekolah[]" />';
+      cell2.innerHTML = '<input class="form-control" type="text" name="jenjang[]" />';
+    //   cell3.innerHTML = '<input class="form-control" type="file" name="hasil[]" multiple="multiple" />';
+    }
+
+    var data_riwayat_pendidikan = <?php echo json_encode($data_riwayat_pendidikan); ?>;
+    // console.log(data_riwayat_pendidikan);
+    data_riwayat_pendidikan.map(function(item){
+        var table = document.getElementById("myTable2");
+        var row = table.insertRow(table.rows.length);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        //   var cell3 = row.insertCell(2);
+        cell1.innerHTML = '<input class="form-control" value="'+item.jenjang+'" type="text" name="nama_sekolah[]" />';
+        cell2.innerHTML = '<input class="form-control" value="'+item.nama_sekolah+'" type="text" name="jenjang[]" />';
+        console.log(item);
+    })
+
+   
+
+
+
+
+
     $('.custom-file-input').on('change', function() {
         var fileName = $(this).val().split('\\').pop();
         $(this).next('.custom-file-label').html(fileName);
